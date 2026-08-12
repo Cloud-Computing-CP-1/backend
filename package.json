@@ -1,0 +1,29 @@
+{
+  "type": "module",
+  "scripts": {
+    "build": "tsc -P .",
+    "start": "node dist/index.js",
+    "dev": "tsc-watch --onSuccess \" npm start \"",
+    "migrate": "tsx src/database/migrate.ts"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.1.2",
+    "@types/pg": "^8.21.0",
+    "express": "^5.2.1",
+    "pg": "^8.23.0",
+    "tsc-watch": "^7.2.1",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "@types/cors": "^2.8.19",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "jsonwebtoken": "^9.0.3",
+    "migrate": "^2.1.0",
+    "ts-node": "^10.9.2"
+  }
+}

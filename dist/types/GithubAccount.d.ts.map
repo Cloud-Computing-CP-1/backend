@@ -1,0 +1,1 @@
+{"version":3,"file":"GithubAccount.d.ts","sourceRoot":"","sources":["../../src/types/GithubAccount.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,aAAa;IAC1B,EAAE,EAAE,MAAM,CAAC;IACX,OAAO,EAAE,MAAM,CAAC;IAChB,SAAS,EAAE,MAAM,CAAC;IAClB,QAAQ,EAAE,MAAM,CAAA;IAChB,UAAU,EAAE,MAAM,CAAC;IACnB,sBAAsB,EAAE,MAAM,CAAC;CAGlC"}

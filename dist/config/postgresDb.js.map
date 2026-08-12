@@ -1,0 +1,1 @@
+{"version":3,"file":"postgresDb.js","sourceRoot":"","sources":["../../src/config/postgresDb.ts"],"names":[],"mappings":"AAAA,OAAO,eAAe,CAAA;AACtB,OAAO,EAAE,EAAE,EAAE,IAAI,EAAE,MAAM,IAAI,CAAA;AAE7B,MAAM,IAAI,GAAG,IAAI,IAAI,CAAC;IAClB,gBAAgB,EAAC,OAAO,CAAC,GAAG,CAAC,YAAa;CAC7C,CAAC,CAAA;AACF,eAAe,IAAI,CAAC"}
