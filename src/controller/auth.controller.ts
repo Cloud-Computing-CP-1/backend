@@ -2,6 +2,7 @@ import "dotenv/config"
 import { type Request, type Response } from "express"
 import { AuthService } from "../service/Auth.service.js";
 import { AuthTokenService } from "../auth/Jwt.token.js";
+import { ErrorMessage, SucessMessage } from "../utils/Response.js";
 export const GitAuthPage = async (req: Request, res: Response) => {
     const githubAuthUrl =
         `https://github.com/login/oauth/authorize` +
@@ -60,4 +61,22 @@ export const GithubCallback = async (req: Request, res: Response) => {
     } catch (error) {
 
     }
+}
+
+
+export const getMyProfile = (req:Request,res:Response)=>{
+ try {
+    if(req?.ClientData?.id){
+        const data = {
+            id:req.ClientData?.id,
+            username:req.ClientData?.username,
+            email:req.ClientData?.email
+        }
+      return SucessMessage(res,200,"Fetch data SucessFull",data)
+    }
+    console.log(req?.ClientData?.id)
+    return ErrorMessage(res,402,"Non-Autherised",)
+ } catch (error) {
+    return ErrorMessage(res,500,"Internal Server Error")
+ }
 }

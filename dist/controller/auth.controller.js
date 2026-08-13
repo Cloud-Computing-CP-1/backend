@@ -2,6 +2,7 @@ import "dotenv/config";
 import {} from "express";
 import { AuthService } from "../service/Auth.service.js";
 import { AuthTokenService } from "../auth/Jwt.token.js";
+import { ErrorMessage, SucessMessage } from "../utils/Response.js";
 export const GitAuthPage = async (req, res) => {
     const githubAuthUrl = `https://github.com/login/oauth/authorize` +
         `?client_id=${process.env.GITHUB_CLIENT_ID}` +
@@ -50,6 +51,23 @@ export const GithubCallback = async (req, res) => {
         res.redirect(process.env.REDIRECT_URL_CLIENT);
     }
     catch (error) {
+    }
+};
+export const getMyProfile = (req, res) => {
+    try {
+        if (req?.ClientData?.id) {
+            const data = {
+                id: req.ClientData?.id,
+                username: req.ClientData?.username,
+                email: req.ClientData?.email
+            };
+            return SucessMessage(res, 200, "Fetch data SucessFull", data);
+        }
+        console.log(req?.ClientData?.id);
+        return ErrorMessage(res, 402, "Non-Autherised");
+    }
+    catch (error) {
+        return ErrorMessage(res, 500, "Internal Server Error");
     }
 };
 //# sourceMappingURL=auth.controller.js.map

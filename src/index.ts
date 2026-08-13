@@ -3,10 +3,12 @@ import express from "express"
 import cors from "cors"
 import AuthRoute from "./routes/Auth.route.js";
 import testConnection from "./dbConnection/db.js";
+import { AuthMiddleWare } from "./middleware/auth.middleware.js";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(AuthMiddleWare)
 const CorsOption = {
     origin: "*",
     optionsSuccessStatus: 200

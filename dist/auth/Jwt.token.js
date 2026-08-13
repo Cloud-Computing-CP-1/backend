@@ -11,5 +11,9 @@ export class AuthTokenService {
         const token = json.sign(payload, tokensecrete);
         return token;
     }
+    static JsonDecoder = (token) => {
+        const userdata = json.verify(token, tokensecrete);
+        return userdata;
+    };
 }
 //# sourceMappingURL=Jwt.token.js.map
