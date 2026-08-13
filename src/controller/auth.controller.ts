@@ -56,7 +56,7 @@ export const GithubCallback = async (req: Request, res: Response) => {
             githubData
         )
         const token = await AuthTokenService.CreateToken(Userdata)
-        console.log(token)
+        res.cookie("Client_token",token)
         res.redirect(process.env.REDIRECT_URL_CLIENT!);
     } catch (error) {
 

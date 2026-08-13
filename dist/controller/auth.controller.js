@@ -47,7 +47,7 @@ export const GithubCallback = async (req, res) => {
         };
         const Userdata = await AuthService.UserRegistration(userData, githubData);
         const token = await AuthTokenService.CreateToken(Userdata);
-        console.log(token);
+        res.cookie("Client_token", token);
         res.redirect(process.env.REDIRECT_URL_CLIENT);
     }
     catch (error) {

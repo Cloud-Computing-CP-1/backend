@@ -4,7 +4,6 @@ export const AuthMiddleWare = async (req: Request, res: Response, next: NextFunc
     try {
         const headerstoken = await req?.headers?.authorization;
         const token = headerstoken?.split(" ")[1];
-        console.log(token)
         if (!token) {
             return next()
         }
