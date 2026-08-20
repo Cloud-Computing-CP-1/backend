@@ -3,6 +3,8 @@ import {} from "express";
 import { AuthService } from "../service/Auth.service.js";
 import { AuthTokenService } from "../auth/Jwt.token.js";
 import { ErrorMessage, SucessMessage } from "../utils/Response.js";
+import { getGithubAccountAccesTokenById } from "../model/user.githubAcount.js";
+import { Octokit } from "octokit";
 export const GitAuthPage = async (req, res) => {
     const githubAuthUrl = `https://github.com/login/oauth/authorize` +
         `?client_id=${process.env.GITHUB_CLIENT_ID}` +
@@ -47,7 +49,11 @@ export const GithubCallback = async (req, res) => {
         };
         const Userdata = await AuthService.UserRegistration(userData, githubData);
         const token = await AuthTokenService.CreateToken(Userdata);
-        res.cookie("Client_token", token);
+        res.cookie("Client_token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax"
+        });
         res.redirect(process.env.REDIRECT_URL_CLIENT);
     }
     catch (error) {
@@ -64,10 +70,38 @@ export const getMyProfile = (req, res) => {
             return SucessMessage(res, 200, "Fetch data SucessFull", data);
         }
         console.log(req?.ClientData?.id);
-        return ErrorMessage(res, 402, "Non-Autherised");
+        return ErrorMessage(res, 401, "Non-Autherised");
     }
     catch (error) {
         return ErrorMessage(res, 500, "Internal Server Error");
+    }
+};
+export const getMyRepo = async (req, res) => {
+    try {
+        const UserId = req.ClientData?.id;
+        if (!UserId) {
+            return ErrorMessage(res, 401, "User not authenticated");
+        }
+        const AcessToken = await getGithubAccountAccesTokenById(UserId);
+        console.log(AcessToken);
+        const token = AcessToken.access_token_encrypted;
+        if (!AcessToken) {
+            return ErrorMessage(res, 404, "Error Deu to Github Not Connected");
+        }
+        const octokit = new Octokit({
+            auth: token
+        });
+        const { data: repositories } = await octokit.rest.repos.listForAuthenticatedUser({
+            per_page: 100,
+            sort: "updated"
+        });
+        console.log(repositories);
+        return SucessMessage(res, 200, "Github RepoFetch", repositories);
+    }
+    catch (error) {
+        console.error("GitHub Error:", error);
+        ;
+        return ErrorMessage(res, 500, "Internal Server Errors");
     }
 };
 //# sourceMappingURL=auth.controller.js.map

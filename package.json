@@ -7,6 +7,7 @@
     "migrate": "tsx src/database/migrate.ts"
   },
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
     "@types/express": "5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.1.2",
@@ -20,10 +21,12 @@
   "dependencies": {
     "@octokit/rest": "^22.0.1",
     "@types/cors": "^2.8.19",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "jsonwebtoken": "^9.0.3",
     "migrate": "^2.1.0",
+    "octokit": "^5.0.5",
     "ts-node": "^10.9.2"
   }
 }

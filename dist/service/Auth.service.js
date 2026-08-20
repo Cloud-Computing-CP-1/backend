@@ -5,7 +5,7 @@ export class AuthService {
         const userExists = await findByEmail(userdata.email);
         if (userExists == null) {
             const newUser = await Create(userdata);
-            const github = await GithubAcountCreate({
+            await GithubAcountCreate({
                 user_id: newUser.id,
                 github_id: user_from_Github.github_id,
                 username: user_from_Github.username,

@@ -9,3 +9,11 @@ export const GithubAcountCreate = async (user_from_Github: Omit<GithubAccount, "
     )
     return result.rows[0]
 }
+
+export const getGithubAccountAccesTokenById = async (id: number) => {
+    const result = await pool.query(
+        `SELECT access_token_encrypted FROM github_accounts WHERE  user_id=$1 `,
+        [id]
+    )
+    return result.rows[0];
+}

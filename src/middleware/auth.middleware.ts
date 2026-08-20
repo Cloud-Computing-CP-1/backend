@@ -2,8 +2,7 @@ import { type Request, type Response, type NextFunction } from "express"
 import { AuthTokenService } from "../auth/Jwt.token.js";
 export const AuthMiddleWare = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const headerstoken = await req?.headers?.authorization;
-        const token = headerstoken?.split(" ")[1];
+       const token  = req.cookies.Client_token;
         if (!token) {
             return next()
         }
