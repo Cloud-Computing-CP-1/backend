@@ -29,6 +29,7 @@
     "octokit": "^5.0.5",
     "simple-git": "^3.36.0",
     "octokit": "^5.0.5",
+    "simple-git": "^3.36.0",
     "ts-node": "^10.9.2"
   }
 }
