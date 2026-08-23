@@ -18,6 +18,50 @@ export class BuildService {
 
         throw new Error('Unsupported repository structure: No package.json, requirements.txt, or go.mod found in root.');
     }
+
+    // Generates a Dockerfile in the workspace based on the detected runtime
+    private async generateDockerfile(runtime: SupportedRuntime, workspacePath: string): Promise<void> {
+        let dockerfileContent = '';
+
+        if (runtime === 'NODEJS') {
+            dockerfileContent = `
+            FROM node:18-alpine
+            WORKDIR /app
+            COPY package*.json ./
+            RUN npm install --production
+            COPY . .
+            # Expose a default port (configurable)
+            EXPOSE 3000
+            CMD ["npm", "start"]
+            `.trim();
+        } else if (runtime === 'PYTHON') {
+            dockerfileContent = `
+            FROM python:3.10-slim
+            WORKDIR /app
+            COPY requirements.txt ./
+            RUN pip install --no-cache-dir -r requirements.txt
+            COPY . .
+            EXPOSE 8000
+            CMD ["python", "app.py"]
+            `.trim();
+        } else if (runtime === 'GO') {
+            dockerfileContent = `
+            FROM golang:1.20-alpine
+            WORKDIR /app
+            COPY go.mod go.sum ./
+            RUN go mod download
+            COPY . .
+            RUN go build -o main .
+            EXPOSE 8080
+            CMD ["./main"]
+            `.trim();
+        }
+
+        const dockerfilePath = path.join(workspacePath, 'Dockerfile');
+        await fs.promises.writeFile(dockerfilePath, dockerfileContent);
+        console.log(`[Build Engine] Generated Dockerfile for ${runtime} at ${dockerfilePath}`);
+    }
+    
     // Clone a remote repository to a temporary workspace
     private async cloneRepository(repoUrl: string, destinationPath: string): Promise<void> {
         const git = simpleGit();
@@ -26,7 +70,7 @@ export class BuildService {
         console.log(`[Build Engine] Clone successful!`);
     }
 
-    async processBuild(repoUrl: string): Promise<SupportedRuntime> {
+    async processBuild(repoUrl: string): Promise<void> {
         // provision temporary workspace (Configurable)
         const baseDir = process.env.BUILD_WORKSPACE_DIR || os.tmpdir();
         const tempPrefix = path.join(baseDir, 'deployforge-build-');
@@ -41,7 +85,9 @@ export class BuildService {
             const runtime = await this.detectLanguage(workspacePath);
             console.log(`[Build Engine] Detected runtime: ${runtime}`);
 
-            return runtime;
+            // Dockerfile generation
+            await this.generateDockerfile(runtime, workspacePath);
+
         } catch (error) {
                 console.error(`[Build Engine] Build failed:`, error);
                 throw error;
