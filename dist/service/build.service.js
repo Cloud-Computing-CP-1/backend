@@ -20,38 +20,65 @@ export class BuildService {
     async generateDockerfile(runtime, workspacePath) {
         let dockerfileContent = '';
         if (runtime === 'NODEJS') {
+            const hasMigrations = fs.existsSync(path.join(workspacePath, 'migrations'));
+            const migrationsCopyCmd = hasMigrations ? 'COPY migrations ./migrations' : '';
             dockerfileContent = `
-            FROM node:18-alpine
-            WORKDIR /app
-            COPY package*.json ./
-            RUN npm install --production
-            COPY . .
-            # Expose a default port (configurable)
-            EXPOSE 3000
-            CMD ["npm", "start"]
-            `.trim();
+# Build
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build
+
+# Production Image
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY --from=builder /app/dist ./dist
+${migrationsCopyCmd}
+EXPOSE 3000 
+CMD ["npm", "start"]
+      `.trim();
         }
         else if (runtime === 'PYTHON') {
             dockerfileContent = `
-            FROM python:3.10-slim
-            WORKDIR /app
-            COPY requirements.txt ./
-            RUN pip install --no-cache-dir -r requirements.txt
-            COPY . .
-            EXPOSE 8000
-            CMD ["python", "app.py"]
-            `.trim();
+# Build
+FROM python:3.10-slim AS builder
+WORKDIR /app
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Production Image
+FROM python:3.10-slim
+WORKDIR /app
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+COPY . .
+EXPOSE 8000
+CMD ["python", "app.py"]
+      `.trim();
         }
         else if (runtime === 'GO') {
             dockerfileContent = `
-            FROM golang:1.20-alpine
-            WORKDIR /app
-            COPY go.mod go.sum ./
-            RUN go mod download
-            COPY . .
-            RUN go build -o main .
-            EXPOSE 8080
-            CMD ["./main"]
+# Build
+FROM golang:1.20-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum* ./
+RUN go mod download
+COPY . .
+RUN go build -o main .
+
+# Production Image
+FROM alpine:latest
+WORKDIR /app
+COPY --from=builder /app/main .
+EXPOSE 8080
+CMD ["./main"]
             `.trim();
         }
         const dockerfilePath = path.join(workspacePath, 'Dockerfile');

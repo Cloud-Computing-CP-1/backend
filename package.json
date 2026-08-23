@@ -21,13 +21,12 @@
   "dependencies": {
     "@octokit/rest": "^22.0.1",
     "@types/cors": "^2.8.19",
+    "bottleneck": "^2.19.5",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "jsonwebtoken": "^9.0.3",
     "migrate": "^2.1.0",
-    "octokit": "^5.0.5",
-    "simple-git": "^3.36.0",
     "octokit": "^5.0.5",
     "simple-git": "^3.36.0",
     "ts-node": "^10.9.2"

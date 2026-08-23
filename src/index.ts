@@ -5,6 +5,7 @@ import AuthRoute from "./routes/Auth.route.js";
 import testConnection from "./dbConnection/db.js";
 import { AuthMiddleWare } from "./middleware/auth.middleware.js";
 import cookieParser from "cookie-parser"
+import buildRoutes from './routes/Build.route.js';
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,3 +26,4 @@ app.use("/api/auth",AuthRoute)
 app.listen(PORT, () => {
     console.log(`Application Runing on http://localhost:${PORT}`)
 })
+app.use('/api/build', buildRoutes);
