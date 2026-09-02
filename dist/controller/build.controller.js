@@ -12,7 +12,7 @@ export const startBuild = async (req, res) => {
         const buildId = crypto.randomUUID();
         console.log(`[API] Received build request ${buildId} for ${repoUrl}`);
         // simulates the SQS decoupling.
-        buildService.processBuild(repoUrl).catch(err => {
+        buildService.processBuild(repoUrl, buildId).catch(err => {
             console.error(`[Background Build ${buildId}] Failed:`, err);
         });
         // Immediately respond to the user

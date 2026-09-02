@@ -20,7 +20,7 @@ export const startBuild = async (req: Request, res: Response): Promise<void> => 
 
         
         // simulates the SQS decoupling.
-        buildService.processBuild(repoUrl).catch(err => {
+        buildService.processBuild(repoUrl, buildId).catch(err => {
             console.error(`[Background Build ${buildId}] Failed:`, err);
         });
 

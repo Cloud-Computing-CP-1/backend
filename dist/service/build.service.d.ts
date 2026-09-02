@@ -1,8 +1,9 @@
-export type SupportedRuntime = 'NODEJS' | 'PYTHON' | 'GO';
 export declare class BuildService {
-    private detectLanguage;
-    private generateDockerfile;
+    private registryService;
+    constructor();
+    private applyBuildStrategy;
+    private buildDockerImage;
     private cloneRepository;
-    processBuild(repoUrl: string): Promise<void>;
+    processBuild(repoUrl: string, buildId: string): Promise<void>;
 }
 //# sourceMappingURL=build.service.d.ts.map

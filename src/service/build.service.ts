@@ -2,93 +2,66 @@ import { simpleGit } from 'simple-git';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import { spawn } from 'child_process';
+import { strategies} from '../templates/buildStrategies.js'; //Import template store
+import { RegistryService} from './registry.service.js';
 
-export type SupportedRuntime = 'NODEJS' | 'PYTHON' | 'GO';
+//export type SupportedRuntime = 'NODEJS' | 'PYTHON' | 'GO';
 
 export class BuildService {
-    // Detect project language by checking for manifest files in the repo root
-    private async detectLanguage(workspacePath: string): Promise<SupportedRuntime> {
-        const hasPackageJson = fs.existsSync(path.join(workspacePath, 'package.json'));
-        const hasRequirementsTxt = fs.existsSync(path.join(workspacePath, 'requirements.txt'));
-        const hasGoMod = fs.existsSync(path.join(workspacePath, 'go.mod'));
+    private registryService: RegistryService;
 
-        if (hasPackageJson) return 'NODEJS';
-        if (hasRequirementsTxt) return 'PYTHON';
-        if (hasGoMod) return 'GO';
-
-        throw new Error('Unsupported repository structure: No package.json, requirements.txt, or go.mod found in root.');
+    constructor() {
+        this.registryService = new RegistryService();
     }
 
-    // Generates a Dockerfile in the workspace based on the detected runtime
-    private async generateDockerfile(runtime: SupportedRuntime, workspacePath: string): Promise<void> {
-        let dockerfileContent = '';
-
-        if (runtime === 'NODEJS') {
-            const hasMigrations = fs.existsSync(path.join(workspacePath, 'migrations'));
-            const migrationsCopyCmd = hasMigrations ? 'COPY migrations ./migrations' : '';
-            dockerfileContent = `
-# Build
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY tsconfig.json ./
-COPY src ./src
-RUN npm run build
-
-# Production Image
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --omit=dev
-COPY --from=builder /app/dist ./dist
-${migrationsCopyCmd}
-EXPOSE 3000 
-CMD ["npm", "start"]
-      `.trim();
-    } else if (runtime === 'PYTHON') {
-      dockerfileContent = `
-# Build
-FROM python:3.10-slim AS builder
-WORKDIR /app
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Production Image
-FROM python:3.10-slim
-WORKDIR /app
-COPY --from=builder /opt/venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-COPY . .
-EXPOSE 8000
-CMD ["python", "app.py"]
-      `.trim();
-    } else if (runtime === 'GO') {
-      dockerfileContent = `
-# Build
-FROM golang:1.20-alpine AS builder
-WORKDIR /app
-COPY go.mod go.sum* ./
-RUN go mod download
-COPY . .
-RUN go build -o main .
-
-# Production Image
-FROM alpine:latest
-WORKDIR /app
-COPY --from=builder /app/main .
-EXPOSE 8080
-CMD ["./main"]
-            `.trim();
+    // Evaluate the repository against the template store
+    private async applyBuildStrategy(workspacePath: string): Promise<void> {
+        for (const strategy of strategies) {
+            if (strategy.match(workspacePath)) {
+                console.log(`[Build Engine] Matched build strategy: ${strategy.name}`);
+                const dockerfileContent = strategy.generate(workspacePath);
+                const dockerfilePath = path.join(workspacePath, 'Dockerfile');
+                await fs.promises.writeFile(dockerfilePath, dockerfileContent);
+                return;
+            }
         }
 
-        const dockerfilePath = path.join(workspacePath, 'Dockerfile');
-        await fs.promises.writeFile(dockerfilePath, dockerfileContent);
-        console.log(`[Build Engine] Generated Dockerfile for ${runtime} at ${dockerfilePath}`);
+        throw new Error('Unsupported repository structure: Could not match any build strategies.');
     }
     
+    // Execute the Docker CLI to build the image
+    private buildDockerImage(workspacePath: string, imageTag: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            console.log(`[Build Engine] Starting Docker build for tag: ${imageTag}...`);
+
+            //`docker build -t <imageTag> .`
+            const dockerBuild = spawn('docker', ['build', '--progress=plain', '-t', imageTag, '.'], {
+                cwd: workspacePath, // Run the command inside the temporary workspace
+            });
+
+            // Capture and print Docker's standard output (build logs)
+            dockerBuild.stdout.on('data', (data) => {
+                console.log(`[Docker Build] ${data.toString().trim()}`);
+            });
+
+            // docker error output
+            dockerBuild.stderr.on('data', (data) => {
+                console.error(`[Docker Build Progress] ${data.toString().trim()}`);
+            });
+
+            // Check command success
+            dockerBuild.on('close', (code) => {
+                if (code === 0) {
+                    console.log(`[BUild Engine] Successfully built Docker image: ${imageTag}`);
+                    resolve();
+                } else {
+                    reject(new Error(`Docker build failed with exit code ${code}`));
+                }
+            });
+        });
+    }
+
     // Clone a remote repository to a temporary workspace
     private async cloneRepository(repoUrl: string, destinationPath: string): Promise<void> {
         const git = simpleGit();
@@ -97,7 +70,7 @@ CMD ["./main"]
         console.log(`[Build Engine] Clone successful!`);
     }
 
-    async processBuild(repoUrl: string): Promise<void> {
+    async processBuild(repoUrl: string, buildId: string): Promise<void> {
         // provision temporary workspace (Configurable)
         const baseDir = process.env.BUILD_WORKSPACE_DIR || os.tmpdir();
         const tempPrefix = path.join(baseDir, 'deployforge-build-');
@@ -108,12 +81,15 @@ CMD ["./main"]
             // execute the clone
             await this.cloneRepository(repoUrl, workspacePath);
 
-            // language detection
-            const runtime = await this.detectLanguage(workspacePath);
-            console.log(`[Build Engine] Detected runtime: ${runtime}`);
+            // apply build strategy
+            await this.applyBuildStrategy(workspacePath);
 
-            // Dockerfile generation
-            await this.generateDockerfile(runtime, workspacePath);
+            // Build docker image
+            const imageTag = `deployforge-app:${buildId}`;
+            await this.buildDockerImage(workspacePath, imageTag);
+
+            //Push to registry service
+            await this.registryService.pushImage(imageTag, buildId);
 
         } catch (error) {
                 console.error(`[Build Engine] Build failed:`, error);

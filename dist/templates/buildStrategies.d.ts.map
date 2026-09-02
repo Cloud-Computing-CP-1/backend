@@ -1,0 +1,1 @@
+{"version":3,"file":"buildStrategies.d.ts","sourceRoot":"","sources":["../../src/templates/buildStrategies.ts"],"names":[],"mappings":"AAIA,MAAM,WAAW,aAAa;IAC5B,IAAI,EAAE,MAAM,CAAC;IAEb,KAAK,EAAE,CAAC,aAAa,EAAE,MAAM,KAAK,OAAO,CAAC;IAE1C,QAAQ,EAAE,CAAC,aAAa,EAAE,MAAM,KAAK,MAAM,CAAC;CAC7C;AAED,eAAO,MAAM,UAAU,EAAE,aAAa,EAwFrC,CAAC"}
