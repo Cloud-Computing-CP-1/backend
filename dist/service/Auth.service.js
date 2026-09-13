@@ -1,5 +1,5 @@
 import { Create, findByEmail, } from "../model/user.model.js";
-import { GithubAcountCreate, } from "../model/user.githubAcount.js";
+import { GithubAcountCreate, UpdateAcessTokenOfUser, } from "../model/user.githubAcount.js";
 export class AuthService {
     static async UserRegistration(userdata, user_from_Github) {
         const userExists = await findByEmail(userdata.email);
@@ -18,6 +18,7 @@ export class AuthService {
                 username: newUser.username
             };
         }
+        await UpdateAcessTokenOfUser(userExists.id, user_from_Github.access_token_encrypted);
         return {
             id: userExists.id,
             email: userExists.email,

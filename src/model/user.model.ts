@@ -21,3 +21,4 @@ export const Create = async (userdata: Omit<User, "id">): Promise<User > => {
     )
     return result.rows[0];
 }
+

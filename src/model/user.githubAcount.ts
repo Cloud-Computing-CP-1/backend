@@ -17,3 +17,9 @@ export const getGithubAccountAccesTokenById = async (id: number) => {
     )
     return result.rows[0];
 }
+
+export const UpdateAcessTokenOfUser = async (id: number, AcessToken: string) => {
+    await pool.query(
+        `UPDATE github_accounts SET access_token_encrypted= $2 WHERE user_id=$1`, [id, AcessToken]
+    )
+}

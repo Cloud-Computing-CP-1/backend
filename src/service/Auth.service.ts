@@ -1,5 +1,5 @@
 import { Create, findByEmail, } from "../model/user.model.js"
-import { GithubAcountCreate, } from "../model/user.githubAcount.js"
+import { GithubAcountCreate, UpdateAcessTokenOfUser, } from "../model/user.githubAcount.js"
 import type { GithubAccount } from "../types/GithubAccount.js";
 import type { User } from "../types/User.js";
 export class AuthService {
@@ -7,20 +7,21 @@ export class AuthService {
         const userExists = await findByEmail(userdata.email)
         if (userExists == null) {
             const newUser = await Create(userdata)
-             await GithubAcountCreate({
+            await GithubAcountCreate({
                 user_id: newUser.id,
                 github_id: user_from_Github.github_id,
                 username: user_from_Github.username,
                 avatar_url: user_from_Github.avatar_url,
                 access_token_encrypted: user_from_Github.access_token_encrypted
             });
+
             return {
                 id: newUser.id,
                 email: newUser.email,
                 username: newUser.username
             };
         }
-
+        await UpdateAcessTokenOfUser(userExists.id, user_from_Github.access_token_encrypted)
         return {
             id: userExists.id,
             email: userExists.email,

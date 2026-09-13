@@ -9,4 +9,7 @@ export const getGithubAccountAccesTokenById = async (id) => {
     const result = await pool.query(`SELECT access_token_encrypted FROM github_accounts WHERE  user_id=$1 `, [id]);
     return result.rows[0];
 };
+export const UpdateAcessTokenOfUser = async (id, AcessToken) => {
+    await pool.query(`UPDATE github_accounts SET access_token_encrypted= $2 WHERE user_id=$1`, [id, AcessToken]);
+};
 //# sourceMappingURL=user.githubAcount.js.map

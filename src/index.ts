@@ -5,6 +5,7 @@ import AuthRoute from "./routes/Auth.route.js";
 import testConnection from "./dbConnection/db.js";
 import { AuthMiddleWare } from "./middleware/auth.middleware.js";
 import cookieParser from "cookie-parser"
+import { BuildRoute } from "./routes/buildimage.route.js";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -22,6 +23,7 @@ app.get("/heath", (req, res) => {
 testConnection()
 const PORT = process.env.PORT || 3000
 app.use("/api/auth",AuthRoute)
+app.use("/api/build",BuildRoute)
 app.listen(PORT, () => {
     console.log(`Application Runing on http://localhost:${PORT}`)
 })

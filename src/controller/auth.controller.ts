@@ -65,9 +65,9 @@ export const GithubCallback = async (req: Request, res: Response) => {
                 sameSite: "lax"
             }
         )
-        res.redirect(process.env.REDIRECT_URL_CLIENT!);
+        res.redirect("http://localhost:5173/myDashboard");
     } catch (error) {
-
+      console.log(error)
     }
 }
 
@@ -97,7 +97,6 @@ export const getMyRepo = async (req: Request, res: Response) => {
         }
 
         const AcessToken = await getGithubAccountAccesTokenById(UserId)
-        console.log(AcessToken)
         const token = AcessToken.access_token_encrypted;
         if (!AcessToken) {
             return ErrorMessage(res, 404, "Error Deu to Github Not Connected")
@@ -110,11 +109,10 @@ export const getMyRepo = async (req: Request, res: Response) => {
             per_page: 100,
             sort: "updated"
         })
-        console.log(repositories)
         return SucessMessage(res, 200, "Github RepoFetch", repositories)
 
     } catch (error) {
         console.error("GitHub Error:", error);;
-        return ErrorMessage(res, 500, "Internal Server Errors")
+        return ErrorMessage(res, 502, "Internal Server Errors")
     }
 }
