@@ -17,6 +17,18 @@ export const getGithubAccountAccesTokenById = async (id: number) => {
     )
     return result.rows[0];
 }
+export const getGithubAccount_id_byUserId = async (id: number) => {
+    const result = await pool.query(
+        `SELECT id FROM github_accounts WHERE  user_id=$1 `,
+        [id]
+    )
+        if (result.rows.length === 0) {
+        return null;
+    }
+
+    return Number(result.rows[0].id);
+
+}
 
 export const UpdateAcessTokenOfUser = async (id: number, AcessToken: string) => {
     await pool.query(

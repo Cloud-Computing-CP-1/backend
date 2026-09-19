@@ -4,4 +4,5 @@ export declare const GitAuthPage: (req: Request, res: Response) => Promise<void>
 export declare const GithubCallback: (req: Request, res: Response) => Promise<void>;
 export declare const getMyProfile: (req: Request, res: Response) => Response<any, Record<string, any>>;
 export declare const getMyRepo: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const webhook: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
 //# sourceMappingURL=auth.controller.d.ts.map

@@ -5,6 +5,9 @@ import { AuthTokenService } from "../auth/Jwt.token.js";
 import { ErrorMessage, SucessMessage } from "../utils/Response.js";
 import { getGithubAccountAccesTokenById } from "../model/user.githubAcount.js";
 import { Octokit } from "octokit";
+import { sqs } from "../index.js";
+import { SendMessageCommand } from "@aws-sdk/client-sqs";
+import { json } from "node:stream/consumers";
 export const GitAuthPage = async (req, res) => {
     const githubAuthUrl = `https://github.com/login/oauth/authorize` +
         `?client_id=${process.env.GITHUB_CLIENT_ID}` +
@@ -70,7 +73,6 @@ export const getMyProfile = (req, res) => {
             };
             return SucessMessage(res, 200, "Fetch data SucessFull", data);
         }
-        console.log(req?.ClientData?.id);
         return ErrorMessage(res, 401, "Non-Autherised");
     }
     catch (error) {
@@ -101,6 +103,30 @@ export const getMyRepo = async (req, res) => {
         console.error("GitHub Error:", error);
         ;
         return ErrorMessage(res, 502, "Internal Server Errors");
+    }
+};
+export const webhook = async (req, res) => {
+    try {
+        const payload = req.body;
+        const message = {
+            repoId: payload.repository.id,
+            name: payload.repository.owner.name,
+            email: payload.repository.owner.email,
+            repoName: payload.repository.name,
+            fullName: payload.repository.full_name,
+            cloneUrl: payload.repository.clone_url,
+            branch: payload.ref,
+            commitSha: payload.after
+        };
+        await sqs.send(new SendMessageCommand({
+            QueueUrl: process.env.AWS_QUEUE_URI,
+            MessageBody: JSON.stringify(message)
+        }));
+        return SucessMessage(res, 200, "Message pushed to _Queue_");
+    }
+    catch (error) {
+        console.error(error);
+        return ErrorMessage(res, 503, "server unavailable");
     }
 };
 //# sourceMappingURL=auth.controller.js.map

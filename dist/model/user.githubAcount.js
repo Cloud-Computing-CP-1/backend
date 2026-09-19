@@ -9,6 +9,13 @@ export const getGithubAccountAccesTokenById = async (id) => {
     const result = await pool.query(`SELECT access_token_encrypted FROM github_accounts WHERE  user_id=$1 `, [id]);
     return result.rows[0];
 };
+export const getGithubAccount_id_byUserId = async (id) => {
+    const result = await pool.query(`SELECT id FROM github_accounts WHERE  user_id=$1 `, [id]);
+    if (result.rows.length === 0) {
+        return null;
+    }
+    return Number(result.rows[0].id);
+};
 export const UpdateAcessTokenOfUser = async (id, AcessToken) => {
     await pool.query(`UPDATE github_accounts SET access_token_encrypted= $2 WHERE user_id=$1`, [id, AcessToken]);
 };

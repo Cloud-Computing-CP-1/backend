@@ -1,0 +1,5 @@
+winget install ngrok -s msstore
+ngrok config add-authtoken YOUR_TOKEN
+--> peast the token in that path ==> get acual token from the ngrok web application
+ngrok http 3001
+that's all

@@ -1,1 +1,1 @@
-while regiting after token geting explire or login gain also id laredy exist then update tokenof user 
+ --> 1\ send mail to client when any service is unavailable to response;
