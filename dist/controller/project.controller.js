@@ -1,7 +1,7 @@
 import {} from "express";
 import { getGithubAccount_id_byUserId } from "../model/user.githubAcount.js";
 import { ErrorMessage, SucessMessage } from "../utils/Response.js";
-import { CreateProject, getAllProject } from "../model/users.projects.js";
+import { CreateProject, getAllProject, getCurrentimageRuning_, getProjectEnv } from "../model/users.projects.js";
 export const CreatePorject = async (req, res) => {
     try {
         const { project_name, repo_name, repo_id, repo_owner, repo_branch, repo_email } = req.body;
@@ -33,6 +33,17 @@ export const GetAllProject = async (req, res) => {
     }
     catch (error) {
         return ErrorMessage(res, 401, "Service is Anvailble");
+    }
+};
+export const getCurrentRuingImage = async (req, res) => {
+    try {
+        const id = req.params?.id;
+        const data = await getCurrentimageRuning_(id);
+        return SucessMessage(res, 200, "fetch all projects", data);
+    }
+    catch (error) {
+        console.log(error);
+        return ErrorMessage(res, 503, "Service is Anvailble");
     }
 };
 //# sourceMappingURL=project.controller.js.map
