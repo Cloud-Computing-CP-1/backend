@@ -1,0 +1,1 @@
+{"version":3,"file":"CloudProviderFactory.d.ts","sourceRoot":"","sources":["../../../../src/service/Cloud_Provider/factory/CloudProviderFactory.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,qBAAqB,EAAE,MAAM,wCAAwC,CAAC;AAGpF,qBAAa,sBAAsB;IAC/B,MAAM,CAAC,MAAM,CAAC,aAAa,EAAE,MAAM,GAAG,qBAAqB,CAa1D;CACJ"}

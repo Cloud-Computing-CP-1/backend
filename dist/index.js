@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 import { BuildRoute } from "./routes/buildimage.route.js";
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { projectRouter } from "./routes/projects.route.js";
+import { deployemnetRouer } from "./routes/Depoy.route.js";
+import { adminRoute } from "./routes/admin.route.js";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,6 +36,8 @@ const PORT = process.env.PORT || 3000;
 app.use("/api/auth", AuthRoute);
 app.use("/api/build", BuildRoute);
 app.use("/api/project", projectRouter);
+app.use("/api/deploy", deployemnetRouer);
+app.use("/api/admin", adminRoute);
 app.listen(PORT, () => {
     console.log(`Application Runing on http://localhost:${PORT}`);
 });
