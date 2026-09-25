@@ -7,8 +7,8 @@ export class AzureDeploymentStrategy
         throw new Error("Azure deployment not implemented");
     }
 
-    async stop(id: number) {}
-    async delete(id: number) {}
+    async stop(id: number) { }
+    async delete(id: number) { }
 
     async getStatus(id: number) {
         return "NOT_IMPLEMENTED";

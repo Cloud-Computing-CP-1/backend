@@ -29,6 +29,10 @@ export const getAllProject = async () => {
     const result = await pool.query(`select * from projects`);
     return result.rows;
 };
+export const get__Project_name = async (project_id) => {
+    const result = await pool.query(`select projects_name from projects where id=$1 `, [project_id]);
+    return result.rows[0];
+};
 export const findProjectUpdatecurrimage = async (image_id, project_id) => {
     const result = await pool.query(`UPDATE  projects 
          SET  current_image_id=$1 

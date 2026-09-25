@@ -1,10 +1,11 @@
+import { AWSDeploymentService } from "../../AWSDeploymentService/AWSDeploymentService.js";
 export class AWSDeploymentStrategy {
+    awsDeployement;
+    constructor(awsDeploymentService) {
+        this.awsDeployement = awsDeploymentService;
+    }
     async deploy(input) {
-        console.log(`Deploying project ${input.imageUri} to AWS`);
-        // We will implement this next.
-        return {
-            status: "RUNNING",
-        };
+        return await this.awsDeployement.deploy(input);
     }
     async stop(deploymentId) {
         console.log("Stopping AWS deployment:", deploymentId);

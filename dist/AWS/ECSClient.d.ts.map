@@ -1,0 +1,1 @@
+{"version":3,"file":"ECSClient.d.ts","sourceRoot":"","sources":["../../src/AWS/ECSClient.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,MAAM,qBAAqB,CAAC;AAChD,OAAO,EAAE,4BAA4B,EAAE,MAAM,2CAA2C,CAAC;AAGzF,eAAO,MAAM,SAAS,WAEpB,CAAC;AACH,eAAO,MAAM,WAAW,8BAEtB,CAAC"}

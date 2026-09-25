@@ -19,7 +19,7 @@ export const DeployAppliation = async (req: Request, res: Response) => {
         const first_name = get_All_Provider.find((p) => p.is_enabled == true)
         const providername = first_name.provider_name;
         console.log(providername)
-        const contariner_port = 20
+        const contariner_port = 80
         const statergy = Clud_Provider_Factory_.Create(providername)
         const deploymentInput: DeploymentInput = {
             imageUri,
