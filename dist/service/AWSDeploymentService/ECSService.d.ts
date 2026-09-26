@@ -1,7 +1,10 @@
 import type { DeploymentInput } from "../Cloud_Provider/strategies/CloudProviderStrategy.js";
 export declare class ECSService {
     registerTaskDefinition(input: DeploymentInput): Promise<string>;
-    createService(input: DeploymentInput, TargetGroupArn: string, taskDefinitionArn: string): Promise<string>;
+    createService(input: DeploymentInput, TargetGroupArn: string, taskDefinitionArn: string): Promise<{
+        serviceArn: string;
+        serviceName: string;
+    }>;
     updateService(): Promise<void>;
     waitUntilHealthy(): Promise<void>;
 }

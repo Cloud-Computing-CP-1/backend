@@ -59,4 +59,8 @@ export const getProjectEnv = async (project_id) => {
          WHERE project_id = $1`, [project_id]);
     return result.rows;
 };
+export const update_url = async (project_id, url, status, providername) => {
+    await pool.query(`UPDATE projects 
+            set deployment_url=$2, statuss=$3, cloud_provider=$4 where id=$1`, [project_id, url, status, providername]);
+};
 //# sourceMappingURL=users.projects.js.map

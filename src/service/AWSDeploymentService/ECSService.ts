@@ -48,7 +48,7 @@ export class ECSService {
         return taskDefinitionArn
     }
 
-    async createService(input: DeploymentInput, TargetGroupArn: string, taskDefinitionArn: string) {
+    async createService(input: DeploymentInput, TargetGroupArn: string, taskDefinitionArn: string):Promise<{ serviceArn:string,serviceName:string}> {
        
                 const subnetIds = process.env.AWS_SUBNET_ID
                     ?.split(",")
@@ -112,7 +112,7 @@ export class ECSService {
 
                 console.log("ECS Service created:", serviceArn);
 
-                return serviceArn;
+                return {serviceArn,serviceName};
             }
 
     async updateService() {

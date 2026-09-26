@@ -76,7 +76,7 @@ export class ECSService {
             throw new Error("ECS Service ARN not returned");
         }
         console.log("ECS Service created:", serviceArn);
-        return serviceArn;
+        return { serviceArn, serviceName };
     }
     async updateService() {
         // AWS ECS SDK

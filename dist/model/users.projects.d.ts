@@ -5,4 +5,5 @@ export declare const findProjectUpdatecurrimage: (image_id: string, project_id: 
 export declare const getCurrentimageRuning_: (project_id: string | string[] | undefined) => Promise<any>;
 export declare const AddEnvto_DB: (project_id: string | string[] | undefined, obj: Object) => Promise<void>;
 export declare const getProjectEnv: (project_id: string | string[] | undefined) => Promise<any[]>;
+export declare const update_url: (project_id: string | string[] | undefined, url: string | undefined, status: string, providername: string) => Promise<void>;
 //# sourceMappingURL=users.projects.d.ts.map

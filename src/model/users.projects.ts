@@ -96,3 +96,10 @@ export const getProjectEnv = async (project_id: string | string[] | undefined) =
 
     return result.rows;
 };
+    export const update_url = async (project_id: string | string[] | undefined,url:string | undefined,status:string,providername:string) => {
+         await pool.query(
+            `UPDATE projects 
+            set deployment_url=$2, statuss=$3, cloud_provider=$4 where id=$1`,
+            [project_id,url,status,providername]
+        );
+    };

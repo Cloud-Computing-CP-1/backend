@@ -136,7 +136,6 @@ export class ALBService {
                 "AWS did not return Listener Rule ARN"
             );
         }
-
         const deploymentUrl =
             `https://${hostname}`;
         return {

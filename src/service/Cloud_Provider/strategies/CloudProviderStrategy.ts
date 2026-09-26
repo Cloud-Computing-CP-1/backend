@@ -7,11 +7,20 @@ export interface DeploymentInput {
 
 export interface DeploymentResult {
     status: "RUNNING" | "FAILED";
-    endpointUrl?: string;
-    providerResourceId?: string;
-    providerMetadata?: Record<string, unknown>;
-}
 
+    deploymentUrl?: string;
+    hostname?: string;
+
+    providerResourceId?: string;
+
+    providerMetadata?: {
+        taskDefinition?: string;
+        targetGroup?: string;
+        ruleArn?: string;
+        serviceName?: string;
+        serviceArn?: string;
+    };
+}
 
 export interface CloudProviderStrategy {
     deploy(

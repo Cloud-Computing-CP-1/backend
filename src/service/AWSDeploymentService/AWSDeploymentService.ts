@@ -15,16 +15,19 @@ export class AWSDeploymentService {
             );
         const project_slug = await get__Project_name(input.project_id)
         const slug = project_slug?.projects_name
-        const routing=await this.albService.createListenerRule(input.project_id,slug,targetGroup)
-        await this.ecsService.createService(input, targetGroup, taskDefinition);
+        const { deploymentUrl, ruleArn, hostname } = await this.albService.createListenerRule(input.project_id, slug, targetGroup)
+        const { serviceArn, serviceName } = await this.ecsService.createService(input, targetGroup, taskDefinition);
         return {
             status: "RUNNING" as const,
-            // providerResourceId:
-            //     ecsService.serviceArn,
-            // providerMetadata: {
-            //     taskDefinition,
-            //     targetGroup
-            // }
+            providerResourceId:serviceArn,
+            providerMetadata: {
+                taskDefinition,
+                targetGroup,
+                ruleArn,
+                serviceName,
+            },
+            deploymentUrl,
+            hostname,
         };
     }
 }

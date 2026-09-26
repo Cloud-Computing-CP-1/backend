@@ -1,9 +1,10 @@
 import { type Request, type Response } from "express"
 import { ErrorMessage, SucessMessage } from "../utils/Response.js";
-import { getCurrentimageRuning_, getProjectEnv } from "../model/users.projects.js";
+import { getCurrentimageRuning_, getProjectEnv, update_url } from "../model/users.projects.js";
 import { getAllCloude_Provider } from "../model/admin.provider.js";
 import { Clud_Provider_Factory_ } from "../service/Cloud_Provider/factory/CloudProviderFactory.js";
 import type { DeploymentInput } from "../service/Cloud_Provider/strategies/CloudProviderStrategy.js";
+import { CreateDeploymentInstance, get_all_deployment_instace } from "../model/user.deployment.js";
 
 export const DeployAppliation = async (req: Request, res: Response) => {
     try {
@@ -11,6 +12,7 @@ export const DeployAppliation = async (req: Request, res: Response) => {
         const _image_details_ = await getCurrentimageRuning_(project_id)
         const all_env = await getProjectEnv(project_id)
         const imageUri = _image_details_?.image_uri
+        const image_id = _image_details_?.id
         const get_All_Provider = await getAllCloude_Provider()
         const deploymentEnv = all_env.map(({ key, value }) => ({
             name: key,
@@ -28,9 +30,41 @@ export const DeployAppliation = async (req: Request, res: Response) => {
             contariner_port
         };
         const result = await statergy.deploy(deploymentInput)
+        const {
+            status,
+            deploymentUrl,
+            hostname,
+            providerResourceId,
+            providerMetadata
+        } = result;
+        const deploymentData = {
+            project_id: deploymentInput.project_id,
+            image_id: image_id,
+            cloud_provider: providername,
+            region: process.env.AWS_REGION!,
+            provider_service: "ECS_FARGATE",
+            status,
+            hostname: hostname ?? null,
+            deployment_url: deploymentUrl ?? null,
+            provider_resource_id: providerResourceId ?? null,
+            provider_metadata: providerMetadata ?? {}
+        };
+        await update_url(project_id, deploymentUrl, "RUNNING", providername);
+        await CreateDeploymentInstance(deploymentData);
         return SucessMessage(res, 200, "Appliation Deployed Succesfully", result)
     } catch (error) {
         console.log(error)
         return ErrorMessage(res, 503, "Service is UNAvaible")
+    }
+}
+
+
+export const get_all_deployment_instaces = async(req:Request,res:Response)=>{
+    try {
+        const id = req.params?.id;
+        const data = await get_all_deployment_instace(id)
+        return SucessMessage(res,200,"data fetch sucesfully",data)
+    } catch (error) {
+        return ErrorMessage(res,503,"Internal server error")
     }
 }
