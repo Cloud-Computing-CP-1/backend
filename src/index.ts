@@ -10,6 +10,7 @@ import { SQSClient } from "@aws-sdk/client-sqs"
 import { projectRouter } from "./routes/projects.route.js";
 import { deployemnetRouer } from "./routes/Depoy.route.js";
 import { adminRoute } from "./routes/admin.route.js";
+import { startQueueWorker } from "./workers/Deployment_Woker/Auto_Deployment.js";
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,8 +26,8 @@ app.get("/heath", (req, res) => {
     res.send('My Application is Working')
 })
 export const sqs = new SQSClient({
-    region: process.env.AWS_REGION!,    
-     credentials: {
+    region: process.env.AWS_REGION!,
+    credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!
     }
@@ -40,4 +41,7 @@ app.use("/api/deploy", deployemnetRouer)
 app.use("/api/admin", adminRoute)
 app.listen(PORT, () => {
     console.log(`Application Runing on http://localhost:${PORT}`)
+    startQueueWorker().catch((Error)=>{
+         console.error("Worker stopped:", Error);
+    })
 })

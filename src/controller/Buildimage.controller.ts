@@ -6,6 +6,9 @@ import { GithubService } from "../service/Github.service.js";
 import { getGithubAccount_id_byUserId, getGithubAccountAccesTokenById } from "../model/user.githubAcount.js";
 import { CreateProject, findProjectUpdatecurrimage } from "../model/users.projects.js";
 import { CreateImage, getimagesproject } from "../model/user.image.js";
+import { ReceiveMessageCommand, DeleteMessageBatchCommand } from "@aws-sdk/client-sqs"
+import { sqs } from "../index.js";
+import type { BuildMessage } from "../types/BuildMessage.js";
 const api = axiosInstance.create({
     baseURL: "https://image-building-microservice-hanr.vercel.app",
 })
@@ -51,7 +54,7 @@ export const imageBuildingEngine = async (req: Request, res: Response) => {
             image_Build_start_time,
             image_Build_com_time
         )
-        await findProjectUpdatecurrimage(image_id?.id,project_id)
+        await findProjectUpdatecurrimage(image_id?.id, project_id)
         // console.log(await GithubService.getwebhook(access_token_encrypted, owner, reponame))
         return SucessMessage(res, 200, "Image BuildSucessFull", data)
     } catch (error) {
@@ -60,27 +63,14 @@ export const imageBuildingEngine = async (req: Request, res: Response) => {
     }
 }
 
-export const getAllIMages = async(req:Request,res:Response)=>{
+export const getAllIMages = async (req: Request, res: Response) => {
     try {
         const id = req.params?.id;
         const getimageofproject = await getimagesproject(id)
-        return SucessMessage(res,200,"fetch data Ssucessfully",getimageofproject)
+        return SucessMessage(res, 200, "fetch data Ssucessfully", getimageofproject)
     } catch (error) {
         console.log(error)
-        return ErrorMessage(res,503,"Service is unavaiable")
+        return ErrorMessage(res, 503, "Service is unavaiable")
     }
 }
-const QUEUE_URL = process.env.AWS_QUEUE_URI!;
-export const auto_build_and_deploy = () => {
-    try {
-        // extract  the depo details  from queue 
-        // apply retry and build image 
-        // if image build not work not delete the message from the queue put the message in DLQ 
-        // send mail to client
-        // if image build work delete the message from queue
-        // and send update the image data from db and send the image_id 
-        // key of row to deployment then deploymemt used this get data from image-table then deploy application and aws or whichevere cloud is available right now
-    } catch (error) {
-        console.log(error)
-    }
-}
+

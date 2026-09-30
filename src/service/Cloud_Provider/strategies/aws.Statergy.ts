@@ -17,6 +17,6 @@ export class AWSDeploymentStrategy implements CloudProviderStrategy {
     }
 
     async getStatus(deploymentId: number): Promise<string> {
-        return "RUNNING";
+        return "RUNNING"
     }
 }
