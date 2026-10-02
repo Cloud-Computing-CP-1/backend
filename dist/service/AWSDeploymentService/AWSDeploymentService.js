@@ -24,5 +24,10 @@ export class AWSDeploymentService {
             hostname,
         };
     }
+    async update(input) {
+        const taskDefinition = await this.ecsService.registerTaskDefinition(input);
+        const { serviceArn } = await this.ecsService.updateService(input.ServiceName, taskDefinition);
+        return { taskDefinition, serviceArn };
+    }
 }
 //# sourceMappingURL=AWSDeploymentService.js.map

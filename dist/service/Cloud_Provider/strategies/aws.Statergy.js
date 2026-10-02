@@ -7,8 +7,8 @@ export class AWSDeploymentStrategy {
     async deploy(input) {
         return await this.awsDeployement.deploy(input);
     }
-    async stop(deploymentId) {
-        console.log("Stopping AWS deployment:", deploymentId);
+    async update(input) {
+        return await this.awsDeployement.update(input);
     }
     async delete(deploymentId) {
         console.log("Deleting AWS deployment:", deploymentId);

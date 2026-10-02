@@ -8,7 +8,7 @@ import { CreateProject, findProjectUpdatecurrimage } from "../model/users.projec
 import { CreateImage, getimagesproject } from "../model/user.image.js";
 import { ReceiveMessageCommand, DeleteMessageBatchCommand } from "@aws-sdk/client-sqs";
 import { sqs } from "../index.js";
-const api = axiosInstance.create({
+export const api = axiosInstance.create({
     baseURL: "https://image-building-microservice-hanr.vercel.app",
 });
 export const imageBuildStatus = async (req, res) => {

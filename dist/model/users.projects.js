@@ -63,4 +63,20 @@ export const update_url = async (project_id, url, status, providername) => {
     await pool.query(`UPDATE projects 
             set deployment_url=$2, statuss=$3, cloud_provider=$4 where id=$1`, [project_id, url, status, providername]);
 };
+// all Deployemnet related Query model
+export const get_Projet_id_from_repo_id = async (repo_id) => {
+    const result = await pool.query(`select id from projects where repo_id=$1`, [repo_id]);
+    return result.rows[0];
+};
+export const update_status = async (projectId, status) => {
+    const result = await pool.query(`
+        UPDATE projects
+        SET
+            statusS = $1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+        RETURNING *
+        `, [status, projectId]);
+    return result.rows[0];
+};
 //# sourceMappingURL=users.projects.js.map

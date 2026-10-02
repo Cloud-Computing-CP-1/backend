@@ -1,4 +1,4 @@
-import { RegisterTaskDefinitionCommand, type RegisterTaskDefinitionCommandOutput,CreateServiceCommand } from "@aws-sdk/client-ecs";
+import { RegisterTaskDefinitionCommand, type RegisterTaskDefinitionCommandOutput, CreateServiceCommand, UpdateClusterCommand, UpdateServiceCommand } from "@aws-sdk/client-ecs";
 import type { DeploymentInput } from "../Cloud_Provider/strategies/CloudProviderStrategy.js";
 import { ecsClient } from "../../AWS/ECSClient.js";
 
@@ -48,77 +48,88 @@ export class ECSService {
         return taskDefinitionArn
     }
 
-    async createService(input: DeploymentInput, TargetGroupArn: string, taskDefinitionArn: string):Promise<{ serviceArn:string,serviceName:string}> {
-       
-                const subnetIds = process.env.AWS_SUBNET_ID
-                    ?.split(",")
-                    .map(id => id.trim());
+    async createService(input: DeploymentInput, TargetGroupArn: string, taskDefinitionArn: string): Promise<{ serviceArn: string, serviceName: string }> {
 
-                const securityGroupId =
-                    process.env.AWS_FARGATE_SECURITY_GROUP_ID;
+        const subnetIds = process.env.AWS_SUBNET_ID
+            ?.split(",")
+            .map(id => id.trim());
 
-                if (!subnetIds || subnetIds.length < 2) {
-                    throw new Error("At least 2 subnet IDs are required");
+        const securityGroupId =
+            process.env.AWS_FARGATE_SECURITY_GROUP_ID;
+
+        if (!subnetIds || subnetIds.length < 2) {
+            throw new Error("At least 2 subnet IDs are required");
+        }
+
+        if (!securityGroupId) {
+            throw new Error("Fargate Security Group ID missing");
+        }
+
+        const serviceName =
+            `df-project-${input.project_id}-service`;
+
+        const containerName =
+            `df-project-${input.project_id}`;
+
+        const command = new CreateServiceCommand({
+
+            cluster: "deployforge-cluster",
+
+            serviceName,
+
+            taskDefinition: taskDefinitionArn,
+
+            desiredCount: 1,
+
+            launchType: "FARGATE",
+
+            networkConfiguration: {
+                awsvpcConfiguration: {
+                    subnets: subnetIds,
+                    securityGroups: [securityGroupId],
+
+                    // For first deployment/testing
+                    assignPublicIp: "ENABLED"
                 }
+            },
 
-                if (!securityGroupId) {
-                    throw new Error("Fargate Security Group ID missing");
+            loadBalancers: [
+                {
+                    targetGroupArn: TargetGroupArn,
+                    containerPort: input.contariner_port,
+                    containerName,
                 }
+            ]
+        });
 
-                const serviceName =
-                    `df-project-${input.project_id}-service`;
+        const response = await ecsClient.send(command);
 
-                const containerName =
-                    `df-project-${input.project_id}`;
+        const serviceArn = response.service?.serviceArn;
 
-                const command = new CreateServiceCommand({
+        if (!serviceArn) {
+            throw new Error("ECS Service ARN not returned");
+        }
 
-                    cluster: "deployforge-cluster",
+        console.log("ECS Service created:", serviceArn);
 
-                    serviceName,
-
-                    taskDefinition: taskDefinitionArn,
-
-                    desiredCount: 1,
-
-                    launchType: "FARGATE",
-
-                    networkConfiguration: {
-                        awsvpcConfiguration: {
-                            subnets: subnetIds,
-                            securityGroups: [securityGroupId],
-
-                            // For first deployment/testing
-                            assignPublicIp: "ENABLED"
-                        }
-                    },
-
-                    loadBalancers: [
-                        {
-                            targetGroupArn: TargetGroupArn,
-                            containerPort:input.contariner_port,
-                            containerName,
-                        }
-                    ]
-                });
-
-                const response = await ecsClient.send(command);
-
-                const serviceArn = response.service?.serviceArn;
-
-                if (!serviceArn) {
-                    throw new Error("ECS Service ARN not returned");
-                }
-
-                console.log("ECS Service created:", serviceArn);
-
-                return {serviceArn,serviceName};
-            }
-
-    async updateService() {
-        // AWS ECS SDK
+        return { serviceArn, serviceName };
     }
 
+    async updateService(serviceName: string, taskDefinitionArn: string):Promise<{ serviceArn: string}>  {
+        const command = new UpdateServiceCommand({
+            cluster: "deployforge-cluster",
+            service: serviceName,
+            taskDefinition: taskDefinitionArn,
+            forceNewDeployment: true
+        });
+        const response = await ecsClient.send(command);
+        const serviceArn = response.service?.serviceArn;
+        console.log(serviceArn)
+        if (!serviceArn) {
+            throw new Error("ECS Service ARN not returned");
+        }
+        return { serviceArn };
+    }
     async waitUntilHealthy() {
         // ECS checking
     }

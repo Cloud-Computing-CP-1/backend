@@ -1,7 +1,7 @@
-import type { CloudProviderStrategy, DeploymentInput, DeploymentResult } from "./CloudProviderStrategy.js";
+import type { CloudProviderStrategy, Deployment_update_Input, Deployment_updateResult, DeploymentInput, DeploymentResult } from "./CloudProviderStrategy.js";
 export declare class AzureDeploymentStrategy implements CloudProviderStrategy {
     deploy(input: DeploymentInput): Promise<DeploymentResult>;
-    stop(id: number): Promise<void>;
+    update(input: Deployment_update_Input): Promise<Deployment_updateResult>;
     delete(id: number): Promise<void>;
     getStatus(id: number): Promise<string>;
 }

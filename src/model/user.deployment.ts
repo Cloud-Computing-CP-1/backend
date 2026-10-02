@@ -1,7 +1,7 @@
 import pool from "../config/postgresDb.js";
 
 export const CreateDeploymentInstance = async (
-    data:any
+    data: any
 ) => {
 
     const result = await pool.query(
@@ -38,9 +38,49 @@ export const CreateDeploymentInstance = async (
     return result.rows[0];
 };
 
-export const get_all_deployment_instace = async(id:string|string[]|undefined)=>{
+export const get_all_deployment_instace = async (id: string | string[] | undefined) => {
     const result = await pool.query(
-        `select * from deployment_instances where project_id=$1`,[id]
+        `select * from deployment_instances where project_id=$1`, [id]
     )
     return result.rows
 }
+export const get_all_deployment_instace_AWS = async (id: string | string[] | undefined, provider_name: string) => {
+    const result = await pool.query(
+        `select * from deployment_instances where project_id=$1 and cloud_provider=$2 `, [id, provider_name]
+    )
+    return result.rows[0]
+}
+
+export const update_Deployment_instance = async (
+    id: string,
+    taskDefinition: string | undefined,
+    serviceArn: string | undefined,
+    imageId: number
+) => {
+    const result = await pool.query(
+        `
+        UPDATE deployment_instances
+        SET
+            image_id = $1,
+            provider_resource_id = $2,
+            provider_metadata =
+                jsonb_set(
+                    COALESCE(provider_metadata, '{}'::jsonb),
+                    '{taskDefinition}',
+                    to_jsonb($3::text)
+                ),
+            status = 'RUNNING',
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $4
+        RETURNING *
+        `,
+        [
+            imageId,
+            serviceArn,
+            taskDefinition,
+            id
+        ]
+    );
+
+    return result.rows[0];
+};

@@ -38,13 +38,7 @@ export class ALBService {
         if (!listenerArn) {
             throw new Error("AWS_ALB_LISTENER_ARN is not configured");
         }
-        // Example:
-        // digital-twin.deployforge.site
         const hostname = `${projectSlug}.deployforge.site`;
-        /*
-         * ALB priorities must be unique.
-         * Fine for your current project IDs.
-         */
         if (!projectId) {
             throw new Error("project_idrequired");
         }

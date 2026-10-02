@@ -9,7 +9,7 @@ import { CreateImage, getimagesproject } from "../model/user.image.js";
 import { ReceiveMessageCommand, DeleteMessageBatchCommand } from "@aws-sdk/client-sqs"
 import { sqs } from "../index.js";
 import type { BuildMessage } from "../types/BuildMessage.js";
-const api = axiosInstance.create({
+export const api = axiosInstance.create({
     baseURL: "https://image-building-microservice-hanr.vercel.app",
 })
 export const imageBuildStatus = async (req: Request, res: Response) => {
@@ -73,4 +73,5 @@ export const getAllIMages = async (req: Request, res: Response) => {
         return ErrorMessage(res, 503, "Service is unavaiable")
     }
 }
+
 

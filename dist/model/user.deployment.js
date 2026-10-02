@@ -33,4 +33,32 @@ export const get_all_deployment_instace = async (id) => {
     const result = await pool.query(`select * from deployment_instances where project_id=$1`, [id]);
     return result.rows;
 };
+export const get_all_deployment_instace_AWS = async (id, provider_name) => {
+    const result = await pool.query(`select * from deployment_instances where project_id=$1 and cloud_provider=$2 `, [id, provider_name]);
+    return result.rows[0];
+};
+export const update_Deployment_instance = async (id, taskDefinition, serviceArn, imageId) => {
+    const result = await pool.query(`
+        UPDATE deployment_instances
+        SET
+            image_id = $1,
+            provider_resource_id = $2,
+            provider_metadata =
+                jsonb_set(
+                    COALESCE(provider_metadata, '{}'::jsonb),
+                    '{taskDefinition}',
+                    to_jsonb($3::text)
+                ),
+            status = 'RUNNING',
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $4
+        RETURNING *
+        `, [
+        imageId,
+        serviceArn,
+        taskDefinition,
+        id
+    ]);
+    return result.rows[0];
+};
 //# sourceMappingURL=user.deployment.js.map

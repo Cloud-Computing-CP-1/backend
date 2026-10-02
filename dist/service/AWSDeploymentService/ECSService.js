@@ -1,4 +1,4 @@
-import { RegisterTaskDefinitionCommand, CreateServiceCommand } from "@aws-sdk/client-ecs";
+import { RegisterTaskDefinitionCommand, CreateServiceCommand, UpdateClusterCommand, UpdateServiceCommand } from "@aws-sdk/client-ecs";
 import { ecsClient } from "../../AWS/ECSClient.js";
 export class ECSService {
     async registerTaskDefinition(input) {
@@ -78,8 +78,20 @@ export class ECSService {
         console.log("ECS Service created:", serviceArn);
         return { serviceArn, serviceName };
     }
-    async updateService() {
-        // AWS ECS SDK
+    async updateService(serviceName, taskDefinitionArn) {
+        const command = new UpdateServiceCommand({
+            cluster: "deployforge-cluster",
+            service: serviceName,
+            taskDefinition: taskDefinitionArn,
+            forceNewDeployment: true
+        });
+        const response = await ecsClient.send(command);
+        const serviceArn = response.service?.serviceArn;
+        console.log(serviceArn);
+        if (!serviceArn) {
+            throw new Error("ECS Service ARN not returned");
+        }
+        return { serviceArn };
     }
     async waitUntilHealthy() {
         // ECS checking

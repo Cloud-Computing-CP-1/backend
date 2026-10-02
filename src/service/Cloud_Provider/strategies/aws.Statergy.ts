@@ -1,4 +1,4 @@
-import type { CloudProviderStrategy, DeploymentResult, DeploymentInput } from "./CloudProviderStrategy.js";
+import type { CloudProviderStrategy, DeploymentResult, DeploymentInput, Deployment_update_Input, Deployment_updateResult } from "./CloudProviderStrategy.js";
 import { AWSDeploymentService } from "../../AWSDeploymentService/AWSDeploymentService.js"
 export class AWSDeploymentStrategy implements CloudProviderStrategy {
     private awsDeployement!: AWSDeploymentService
@@ -8,8 +8,8 @@ export class AWSDeploymentStrategy implements CloudProviderStrategy {
     async deploy(input: DeploymentInput): Promise<DeploymentResult> {
         return await this.awsDeployement.deploy(input)
     }
-    async stop(deploymentId: number): Promise<void> {
-        console.log("Stopping AWS deployment:", deploymentId);
+    async update(input:Deployment_update_Input): Promise<Deployment_updateResult> {
+        return await this.awsDeployement.update(input)
     }
 
     async delete(deploymentId: number): Promise<void> {

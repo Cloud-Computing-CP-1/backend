@@ -5,7 +5,9 @@ export declare class ECSService {
         serviceArn: string;
         serviceName: string;
     }>;
-    updateService(): Promise<void>;
+    updateService(serviceName: string, taskDefinitionArn: string): Promise<{
+        serviceArn: string;
+    }>;
     waitUntilHealthy(): Promise<void>;
 }
 //# sourceMappingURL=ECSService.d.ts.map

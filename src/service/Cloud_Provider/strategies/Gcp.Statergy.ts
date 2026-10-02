@@ -1,4 +1,4 @@
-import type { CloudProviderStrategy, DeploymentInput, DeploymentResult } from "./CloudProviderStrategy.js";
+import type { CloudProviderStrategy, Deployment_update_Input, Deployment_updateResult, DeploymentInput, DeploymentResult } from "./CloudProviderStrategy.js";
 
 export class GCPDeploymentStrategy
     implements CloudProviderStrategy {
@@ -7,8 +7,10 @@ export class GCPDeploymentStrategy
         throw new Error("GCP deployment not implemented");
     }
 
-    async stop(id: number) {}
-    async delete(id: number) {}
+    async update(input: Deployment_update_Input):Promise<Deployment_updateResult> { 
+         throw new Error("GCP deployment not implemented");
+    }
+    async delete(id: number) { }
 
     async getStatus(id: number) {
         return "NOT_IMPLEMENTED";

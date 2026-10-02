@@ -48,9 +48,9 @@ export const getAllProject = async () => {
     )
     return result.rows;
 }
-export const get__Project_name = async (project_id:string|string[]|undefined) => {
+export const get__Project_name = async (project_id: string | string[] | undefined) => {
     const result = await pool.query(
-        `select projects_name from projects where id=$1 `,[project_id]
+        `select projects_name from projects where id=$1 `, [project_id]
     )
     return result.rows[0];
 }
@@ -96,10 +96,42 @@ export const getProjectEnv = async (project_id: string | string[] | undefined) =
 
     return result.rows;
 };
-    export const update_url = async (project_id: string | string[] | undefined,url:string | undefined,status:string,providername:string) => {
-         await pool.query(
-            `UPDATE projects 
+export const update_url = async (project_id: string | string[] | undefined, url: string | undefined, status: string, providername: string) => {
+    await pool.query(
+        `UPDATE projects 
             set deployment_url=$2, statuss=$3, cloud_provider=$4 where id=$1`,
-            [project_id,url,status,providername]
-        );
-    };
+        [project_id, url, status, providername]
+    );
+};
+
+
+
+
+// all Deployemnet related Query model
+
+export const get_Projet_id_from_repo_id = async (repo_id: number) => {
+    const result = await pool.query(
+        `select id from projects where repo_id=$1`, [repo_id]
+    )
+
+    return result.rows[0]
+}
+
+export const update_status = async (
+    projectId: number,
+    status: "PENDING" | "BUILDING" | "DEPLOYING" | "RUNNING" | "FAILED" | "STOPPED"
+) => {
+    const result = await pool.query(
+        `
+        UPDATE projects
+        SET
+            statusS = $1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+        RETURNING *
+        `,
+        [status, projectId]
+    );
+
+    return result.rows[0];
+};

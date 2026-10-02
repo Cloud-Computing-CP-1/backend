@@ -6,4 +6,6 @@ export declare const getCurrentimageRuning_: (project_id: string | string[] | un
 export declare const AddEnvto_DB: (project_id: string | string[] | undefined, obj: Object) => Promise<void>;
 export declare const getProjectEnv: (project_id: string | string[] | undefined) => Promise<any[]>;
 export declare const update_url: (project_id: string | string[] | undefined, url: string | undefined, status: string, providername: string) => Promise<void>;
+export declare const get_Projet_id_from_repo_id: (repo_id: number) => Promise<any>;
+export declare const update_status: (projectId: number, status: "PENDING" | "BUILDING" | "DEPLOYING" | "RUNNING" | "FAILED" | "STOPPED") => Promise<any>;
 //# sourceMappingURL=users.projects.d.ts.map

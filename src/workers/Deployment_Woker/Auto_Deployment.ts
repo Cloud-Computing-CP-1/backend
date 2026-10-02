@@ -43,7 +43,6 @@ export const startQueueWorker = async (
                     }
 
                     const payload: BuildMessage = JSON.parse(message.Body);
-                    console.log(payload)
                     await Auto_Deploy.Porcess_data_Deploye(payload);
                     await sqs.send(
                         new DeleteMessageCommand({
@@ -57,7 +56,7 @@ export const startQueueWorker = async (
                 }
             }
         } catch (error) {
-            console.error("Queue polling failed:", error);
+            console.error("Que  ue polling failed:", error);
             await new Promise(resolve => setTimeout(resolve, 5000));
         }
     }

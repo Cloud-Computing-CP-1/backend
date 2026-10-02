@@ -2,7 +2,9 @@ export class AzureDeploymentStrategy {
     async deploy(input) {
         throw new Error("Azure deployment not implemented");
     }
-    async stop(id) { }
+    async update(input) {
+        throw new Error("GCP deployment not implemented");
+    }
     async delete(id) { }
     async getStatus(id) {
         return "NOT_IMPLEMENTED";
