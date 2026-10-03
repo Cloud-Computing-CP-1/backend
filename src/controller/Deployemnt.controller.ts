@@ -5,6 +5,7 @@ import { getAllCloude_Provider } from "../model/admin.provider.js";
 import { Clud_Provider_Factory_ } from "../service/Cloud_Provider/factory/CloudProviderFactory.js";
 import type { DeploymentInput } from "../service/Cloud_Provider/strategies/CloudProviderStrategy.js";
 import { CreateDeploymentInstance, get_all_deployment_instace } from "../model/user.deployment.js";
+import { create_deployment_history, get_deployment_history_by_project, get_deployment_history_get_all, Update_deployement_history } from "../model/project.history.js";
 
 export const DeployAppliation = async (req: Request, res: Response) => {
     try {
@@ -50,7 +51,15 @@ export const DeployAppliation = async (req: Request, res: Response) => {
             provider_metadata: providerMetadata ?? {}
         };
         await update_url(project_id, deploymentUrl, "RUNNING", providername);
-        await CreateDeploymentInstance(deploymentData);
+        const deployment_instance_id = await CreateDeploymentInstance(deploymentData);
+        await create_deployment_history(
+            deployment_instance_id,
+            project_id,
+            image_id,
+            providername,
+            providerMetadata?.taskDefinition!
+        )
+        await Update_deployement_history(deployment_instance_id, providerMetadata?.taskDefinition!)
         return SucessMessage(res, 200, "Appliation Deployed Succesfully", result)
     } catch (error) {
         console.log(error)
@@ -59,12 +68,31 @@ export const DeployAppliation = async (req: Request, res: Response) => {
 }
 
 
-export const get_all_deployment_instaces = async(req:Request,res:Response)=>{
+export const get_all_deployment_instaces = async (req: Request, res: Response) => {
     try {
         const id = req.params?.id;
         const data = await get_all_deployment_instace(id)
-        return SucessMessage(res,200,"data fetch sucesfully",data)
+        return SucessMessage(res, 200, "data fetch sucesfully", data)
     } catch (error) {
-        return ErrorMessage(res,503,"Internal server error")
+        return ErrorMessage(res, 503, "Internal server error")
+    }
+}
+export const get_all_deployment_instaces_history_ = async (req: Request, res: Response) => {
+    try {
+        const data = await get_deployment_history_get_all()
+        return SucessMessage(res, 200, "data fetch sucesfully", data)
+    } catch (error) {
+        console.log(error)
+        return ErrorMessage(res, 503, "Internal server error")
+    }
+}
+export const get_all_deployment_instaces_history_project = async (req: Request, res: Response) => {
+    try {
+        const id = req.params?.id;
+        const data = await get_deployment_history_by_project(id)
+        return SucessMessage(res, 200, "data fetch sucesfully", data)
+    } catch (error) {
+        console.log(error)
+        return ErrorMessage(res, 503, "Internal server error")
     }
 }

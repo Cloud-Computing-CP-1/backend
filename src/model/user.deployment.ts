@@ -19,7 +19,7 @@ export const CreateDeploymentInstance = async (
             provider_metadata
         )
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
-        RETURNING *
+        RETURNING  id
         `,
         [
             data.project_id,

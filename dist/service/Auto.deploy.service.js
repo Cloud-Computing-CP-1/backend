@@ -1,5 +1,6 @@
 import { api } from "../controller/Buildimage.controller.js";
 import { getAllCloude_Provider } from "../model/admin.provider.js";
+import { create_deployment_history, Update_deployement_history } from "../model/project.history.js";
 import { get_all_deployment_instace_AWS, update_Deployment_instance } from "../model/user.deployment.js";
 import { CreateImage } from "../model/user.image.js";
 import { findProjectUpdatecurrimage, get__Project_name, get_Projet_id_from_repo_id, getProjectEnv, update_status } from "../model/users.projects.js";
@@ -65,10 +66,12 @@ export class Auto_Deploy {
                 contariner_port: 80,
                 ServiceName: serviceName
             };
+            await create_deployment_history(existingDeployment.id, projectId, imageId, providerName, "");
             const statergy = Clud_Provider_Factory_.Create(providerName);
             const { taskDefinition, serviceArn } = await statergy.update(deploymentInput_update);
             await update_Deployment_instance(existingDeployment.id, taskDefinition, serviceArn, imageId);
             await update_status(projectId, "RUNNING");
+            await Update_deployement_history(existingDeployment.id, taskDefinition);
         }
         // Only return when EVERYTHING succeeded.
         return {
