@@ -1,0 +1,1 @@
+{"version":3,"file":"rate_limiter_Token_Buket.d.ts","sourceRoot":"","sources":["../../src/middleware/rate_limiter_Token_Buket.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,OAAO,EAAE,QAAQ,EAAE,YAAY,EAAE,MAAM,SAAS,CAAC;AAG/D,eAAO,MAAM,aAAa,YAOzB,CAAA;AAED,eAAO,MAAM,YAAY,QAChB,OAAO,OACP,QAAQ,QACP,YAAY,4DAarB,CAAA"}

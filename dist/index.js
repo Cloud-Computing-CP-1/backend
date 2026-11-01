@@ -4,12 +4,15 @@ import cors from "cors";
 import AuthRoute from "./routes/Auth.route.js";
 import testConnection from "./dbConnection/db.js";
 import { AuthMiddleWare } from "./middleware/auth.middleware.js";
+import { RateLimitter } from "./middleware/rate_limiter_Token_Buket.js";
+import { BucketRefiler } from "./middleware/rate_limiter_Token_Buket.js";
 import cookieParser from "cookie-parser";
 import { BuildRoute } from "./routes/buildimage.route.js";
 import { SQSClient } from "@aws-sdk/client-sqs";
 import { projectRouter } from "./routes/projects.route.js";
 import { deployemnetRouer } from "./routes/Depoy.route.js";
 import { adminRoute } from "./routes/admin.route.js";
+import { CronJob } from "cron";
 import { startQueueWorker } from "./workers/Deployment_Woker/Auto_Deployment.js";
 const app = express();
 app.use(express.json());
@@ -22,6 +25,7 @@ const CorsOption = {
     optionsSuccessStatus: 200
 };
 app.use(cors(CorsOption));
+app.use(RateLimitter);
 app.get("/heath", (req, res) => {
     res.send('My Application is Working');
 });
@@ -39,10 +43,14 @@ app.use("/api/build", BuildRoute);
 app.use("/api/project", projectRouter);
 app.use("/api/deploy", deployemnetRouer);
 app.use("/api/admin", adminRoute);
+const job = new CronJob('*/2 * * * * *', () => {
+    BucketRefiler();
+});
 app.listen(PORT, () => {
     console.log(`Application Runing on http://localhost:${PORT}`);
     startQueueWorker().catch((Error) => {
         console.error("Worker stopped:", Error);
     });
+    job.start();
 });
 //# sourceMappingURL=index.js.map
